@@ -1,25 +1,40 @@
 #!/usr/bin/env python3
 
 import os
+from configparser import ConfigParser
 from subprocess import check_call
 
 from p import find_available_commands, alias_and_resolve
 
 
+def read_cfg(*, cmd_name):
+    filename = '.%s-config' % cmd_name
+    config = ConfigParser()
+    config.read([filename, os.path.expanduser('~/' + filename)], encoding='utf8')
+    r = dict(config.items('general'))
+    if config.has_section('aliases'):
+        config['aliases'] = dict(config.items('aliases'))
+    return r
+
+
 def main(argv):
     _, my_name = os.path.split(argv[0])
     cmd_name, _ = os.path.splitext(my_name)
+
+    cfg = read_cfg(cmd_name=cmd_name)
+
     available_commands = find_available_commands()
     command = alias_and_resolve(
         cmd_name=cmd_name,
         cmd=' '.join([cmd_name] + argv[1:]),
         available_commands=available_commands,
-        cfg={},
+        cfg=cfg,
     )
     if command is None:
         print('Unknown command. Available commands:')
         for c in available_commands:
-            print('\t', c)
+            if c.startswith('%s-' % cmd_name):
+                print('\t', c)
     else:
         check_call(command, shell=True)
 

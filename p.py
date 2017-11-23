@@ -8,7 +8,7 @@ def find_available_commands():
     for path in os.environ["PATH"].split(os.pathsep):
         r.extend([x for x in os.listdir(path) if os.access(x, os.X_OK)])
 
-    return [x for x in r if x.startswith('p-')]
+    return [x for x in r if x]
 
 
 def alias_project_type(*, cmd_name, cmd, cfg):
