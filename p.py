@@ -1,10 +1,12 @@
+#!/usr/bin/env python3
+
 import os
 
 
 def find_available_commands():
     r = []
     for path in os.environ["PATH"].split(os.pathsep):
-        r.extend(os.listdir(path))
+        r.extend([x for x in os.listdir(path) if os.access(x, os.X_OK)])
 
     return [x for x in r if x.startswith('p-')]
 
@@ -48,7 +50,7 @@ def resolve_cmd(*, available_commands, cmd):
         try_command = '-'.join([prefix] + command[:c])
         if try_command in available_commands:
             params = command[c:]
-            return try_command + ' ' + ' '.join(params)
+            return ' '.join([try_command] + params)
     if prefix in available_commands:
         return ' '.join([prefix] + command)
 
