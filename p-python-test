@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 source $(p env_path)/bin/activate
+p install
 pip install -r test_requirements.txt
-python $@
+pytest $@

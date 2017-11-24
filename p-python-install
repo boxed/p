@@ -1,4 +1,3 @@
 #!/usr/bin/env bash
 source $(p env_path)/bin/activate
-pip install -r test_requirements.txt
-python $@
+pip install -r requirements.txt
