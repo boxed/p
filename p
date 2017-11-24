@@ -24,6 +24,7 @@ def main(argv):
     cfg = read_cfg(cmd_name=cmd_name)
 
     available_commands = find_available_commands()
+    available_commands.remove(cmd_name)
     command = alias_and_resolve(
         cmd_name=cmd_name,
         cmd=' '.join([cmd_name] + argv[1:]),
@@ -36,7 +37,7 @@ def main(argv):
             if c.startswith('%s-' % cmd_name):
                 print('\t', c)
     else:
-        check_call(command, shell=True)
+        check_call(command, shell=True, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
 
 
 if __name__ == '__main__':
