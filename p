@@ -2,7 +2,7 @@
 
 import os
 from configparser import ConfigParser
-from subprocess import check_call
+from subprocess import call
 
 from p import find_available_commands, alias_and_resolve
 
@@ -13,7 +13,7 @@ def read_cfg(*, cmd_name):
     config.read([filename, os.path.expanduser('~/' + filename)], encoding='utf8')
     r = dict(config.items('general'))
     if config.has_section('aliases'):
-        config['aliases'] = dict(config.items('aliases'))
+        r['aliases'] = dict(config.items('aliases'))
     return r
 
 
@@ -37,7 +37,7 @@ def main(argv):
             if c.startswith('%s-' % cmd_name):
                 print('\t', c)
     else:
-        check_call(command, shell=True, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+        exit(call(command, shell=True, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr))
 
 
 if __name__ == '__main__':

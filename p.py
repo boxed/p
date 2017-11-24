@@ -6,8 +6,7 @@ import os
 def find_available_commands():
     r = []
     for path in os.environ["PATH"].split(os.pathsep):
-        r.extend([x for x in os.listdir(path) if os.access(x, os.X_OK)])
-
+        r.extend([x for x in os.listdir(path) if os.access(os.path.join(path, x), os.X_OK)])
     return set(r)
 
 
@@ -46,6 +45,8 @@ def alias(*, cmd_name, cmd, cfg):
 
 def resolve_cmd(*, available_commands, cmd):
     prefix, *command = cmd.split(' ')
+    if '/' in prefix:
+        return cmd
     for c in reversed(range(1, len(command) + 1)):
         try_command = '-'.join([prefix] + command[:c])
         if try_command in available_commands:

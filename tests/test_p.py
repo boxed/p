@@ -39,6 +39,7 @@ def test_resolve():
     assert resolve_cmd(available_commands=['p-new', 'p-new-python'], cmd='p new python foo') == 'p-new-python foo'
     assert resolve_cmd(available_commands=[], cmd='p new python foo') is None
     assert resolve_cmd(available_commands=['p-help', ], cmd='p help') == 'p-help'
+    assert resolve_cmd(available_commands=[], cmd='foo/bar/baz') == 'foo/bar/baz'
 
 
 def test_alias_and_resolve():
