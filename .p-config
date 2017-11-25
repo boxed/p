@@ -2,4 +2,3 @@
 project_type=python
 
 [aliases]
-p repl=p run ipython
