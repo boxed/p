@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-source $(p env_path)/bin/activate
 p install
-pip install -r test_requirements.txt
-pytest $@
+# handle https://bugs.python.org/issue22490:
+unset __PYVENV_LAUNCHER__
+$(p env_path)/bin/pip install -r test_requirements.txt
+$(p env_path)/bin/pytest $@

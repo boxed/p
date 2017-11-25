@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
-source $(p env_path)/bin/activate
-pip install -r requirements.txt
+# handle https://bugs.python.org/issue22490:
+unset __PYVENV_LAUNCHER__
+$(p env_path)/bin/pip install -r requirements.txt
