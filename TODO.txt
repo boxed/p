@@ -1,1 +1,2 @@
 * Default arguments. p run, p install would benefit from this
+* autodetect project type for top 10 languages
