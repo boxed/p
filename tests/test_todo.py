@@ -1,4 +1,4 @@
-from p import alias_and_resolve
+from p import alias_and_resolve, auto_detect_project_type
 
 
 def test_fallback():
@@ -24,19 +24,6 @@ def test_fallback():
 #             },
 #         )
 #     )
-
-
-def auto_detect_project_type(filenames):
-    simple_filename_tells = dict(
-        python='requirements.txt',
-        elm='elm-package.json',
-        clojure='project.clj',
-        swift='Package.swift',
-        java='pom.xml',
-    )
-    for language, filename in simple_filename_tells.items():
-        if filename in filenames:
-            return language
 
 
 def test_autodetect_python():

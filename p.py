@@ -3,6 +3,19 @@
 import os
 
 
+def auto_detect_project_type(*, filenames):
+    simple_filename_tells = dict(
+        python='requirements.txt',
+        elm='elm-package.json',
+        clojure='project.clj',
+        swift='Package.swift',
+        java='pom.xml',
+    )
+    for language, filename in simple_filename_tells.items():
+        if filename in filenames:
+            return language
+
+
 def find_available_commands():
     r = []
     for path in os.environ["PATH"].split(os.pathsep):
