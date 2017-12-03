@@ -14,6 +14,8 @@ def read_cfg(*, cmd_name):
     r = dict(config.items('general'))
     if config.has_section('aliases'):
         r['aliases'] = dict(config.items('aliases'))
+    if config.has_section('defaults'):
+        r['defaults'] = dict(config.items('defaults'))
     return r
 
 

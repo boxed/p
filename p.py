@@ -69,9 +69,18 @@ def resolve_cmd(*, available_commands, cmd):
         return ' '.join([prefix] + command)
 
 
+def apply_default(*, cmd, cfg):
+    if cmd is None:
+        return None
+    default = cfg.get('defaults', {}).get(cmd.replace('-', ' '), None)
+    return f'{cmd} {default}' if default else cmd
+
+
 def alias_and_resolve(*, cmd_name, cmd, available_commands, cfg):
     cmd = alias(cmd_name=cmd_name, cmd=cmd, cfg=cfg)
-    return resolve_cmd(available_commands=available_commands, cmd=cmd)
+    resolved_cmd = resolve_cmd(available_commands=available_commands, cmd=cmd)
+    resolved_cmd_with_default = apply_default(cmd=resolved_cmd, cfg=cfg)
+    return resolved_cmd_with_default
 
 
 class ConfigError(Exception):

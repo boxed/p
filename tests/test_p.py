@@ -1,6 +1,7 @@
 import pytest
 
-from p import validate_config, ConfigError, resolve_cmd, alias_and_resolve, alias, alias_once, alias_project_type
+from p import validate_config, ConfigError, resolve_cmd, alias_and_resolve, alias, alias_once, alias_project_type, \
+    apply_default
 
 
 def test_alias_project_type():
@@ -52,3 +53,9 @@ def test_validate_config():
 
     with pytest.raises(ConfigError):
         validate_config(cfg=dict(aliases={'foo-bar': 'bar-baz'}))
+
+
+def test_defaults():
+    assert 'p-run foo' == apply_default(cmd='p-run', cfg=dict(defaults={'p run': 'foo'}))
+
+    assert 'p-run foo' == alias_and_resolve(cmd_name='p', cmd='p run', available_commands=['p-run'], cfg=dict(defaults={'p run': 'foo'}))
