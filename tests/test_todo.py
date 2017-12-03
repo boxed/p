@@ -1,7 +1,7 @@
 from p import alias_and_resolve, auto_detect_project_type
 
 
-def test_fallback():
+def test_fallback_to_non_project_specific_command():
     assert 'p-new foo' == alias_and_resolve(
         cmd_name='p',
         cmd='p new foo',
