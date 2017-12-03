@@ -1,7 +1,7 @@
 import pytest
 
 from p import validate_config, ConfigError, resolve_cmd, alias_and_resolve, alias, alias_once, alias_project_type, \
-    apply_default
+    apply_default, auto_detect_project_type
 
 
 def test_alias_project_type():
@@ -59,3 +59,124 @@ def test_defaults():
     assert 'p-run foo' == apply_default(cmd='p-run', cfg=dict(defaults={'p run': 'foo'}))
 
     assert 'p-run foo' == alias_and_resolve(cmd_name='p', cmd='p run', available_commands=['p-run'], cfg=dict(defaults={'p run': 'foo'}))
+
+
+def test_autodetect_python():
+    assert 'python' == auto_detect_project_type(filenames=[
+        'docs/',
+        'examples/',
+        'lib/',
+        'tests/',
+        '.coveragerc',
+        '.gitignore',
+        '.travis.yml',
+        'AUTHORS.rst',
+        'CONTRIBUTING.rst',
+        'HISTORY.rst',
+        'LICENSE	tri',
+        'MANIFEST.in',
+        'Makefile',
+        'README.rst',
+        'TODO',
+        'doc_output.py',
+        'doc_viewer.html',
+        'requirements.txt',
+        'setup.cfg',
+        'setup.py',
+        'table.css',
+        'table.scss',
+        'table_example_1.png',
+        'test_requirements.txt',
+        'tox.ini',
+        'venv_requirements.txt',
+    ])
+
+
+def test_autodetect_elm():
+    assert 'elm' == auto_detect_project_type(filenames=[
+        'src/',
+        'tests/',
+        '.gitignore',
+        '.travis.yml',
+        'LICENSE',
+        'README.md',
+        'elm-package.json',
+    ])
+
+
+def test_autodetect_clojure():
+    assert 'clojure' == auto_detect_project_type(filenames=[
+        'config/',
+        'pkg/',
+        'resources/',
+        'src/',
+        'tasks/',
+        'test/',
+        '.gitignore',
+        '.lein-classpath',
+        '.travis.yml',
+        'CHANGES.markdown',
+        'CONTRIBUTING.markdown',
+        'LICENSE',
+        'README.markdown',
+        'project.clj',
+    ])
+
+
+def test_autodetect_swift():
+    assert 'swift' == auto_detect_project_type(filenames=[
+        'Alamofire.xcodeproj/',
+        'Alamofire.xcworkspace/',
+        'Documentation/',
+        'Example/',
+        'Source/',
+        'Tests/',
+        'docs/',
+        '.gitignore',
+        '.jazzy.yaml',
+        '.ruby-gemset',
+        '.ruby-version',
+        '.swift-version',
+        '.travis.yml',
+        'Alamofire.podspec',
+        'CHANGELOG.md',
+        'CONTRIBUTING.md',
+        'Gemfile',
+        'Gemfile.lock',
+        'ISSUE_TEMPLATE.md',
+        'LICENSE',
+        'PULL_REQUEST_TEMPLATE.md',
+        'Package.swift',
+        'README.md',
+        'alamofire.png',
+    ])
+
+
+def test_autodetect_java():
+    assert 'java' == auto_detect_project_type(filenames=[
+        '.buildscript/',
+        '.github/',
+        'benchmarks/',
+        'mockwebserver/',
+        'okcurl/',
+        'okhttp-android/',
+        'okhttp-apache/',
+        'okhttp-hpacktests/',
+        'okhttp-logging/',
+        'okhttp-testing/',
+        'okhttp-tests/',
+        'okhttp-urlconnection/',
+        'okhttp/',
+        'samples/',
+        'website/',
+        '.gitignore',
+        '.gitmodules',
+        '.travis.yml',
+        'BUG-BOUNTY',
+        'CHANGELOG.md',
+        'LICENSE.txt',
+        'README.md',
+        'checkstyle.xml',
+        'deploy_website.sh',
+        'pom.xml',
+    ])

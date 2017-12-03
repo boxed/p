@@ -4,7 +4,7 @@ import os
 from configparser import ConfigParser
 from subprocess import call
 
-from p import find_available_commands, alias_and_resolve
+from p import find_available_commands, alias_and_resolve, auto_detect_project_type
 
 
 def read_cfg(*, cmd_name):
@@ -24,9 +24,12 @@ def main(argv):
     cmd_name, _ = os.path.splitext(my_name)
 
     cfg = read_cfg(cmd_name=cmd_name)
+    if 'project_type' not in cfg:
+        detected_project_type = auto_detect_project_type(filenames=os.listdir('.'))
+        if detected_project_type:
+            cfg['project_type'] = detected_project_type
 
     available_commands = find_available_commands()
-    available_commands.remove(cmd_name)
     command = alias_and_resolve(
         cmd_name=cmd_name,
         cmd=' '.join([cmd_name] + argv[1:]),

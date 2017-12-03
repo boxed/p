@@ -77,6 +77,8 @@ def apply_default(*, cmd, cfg):
 
 
 def alias_and_resolve(*, cmd_name, cmd, available_commands, cfg):
+    if cmd_name in available_commands:
+        available_commands.remove(cmd_name)  # avoid circular lookup
     cmd = alias(cmd_name=cmd_name, cmd=cmd, cfg=cfg)
     resolved_cmd = resolve_cmd(available_commands=available_commands, cmd=cmd)
     resolved_cmd_with_default = apply_default(cmd=resolved_cmd, cfg=cfg)
