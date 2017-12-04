@@ -11,7 +11,9 @@ def read_cfg(*, cmd_name):
     filename = '.%s-config' % cmd_name
     config = ConfigParser()
     config.read([filename, os.path.expanduser('~/' + filename)], encoding='utf8')
-    r = dict(config.items('general'))
+    r = {}
+    if config.has_section('general'):
+        r.update(dict(config.items('general')))
     if config.has_section('aliases'):
         r['aliases'] = dict(config.items('aliases'))
     if config.has_section('defaults'):
