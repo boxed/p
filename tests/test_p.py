@@ -56,9 +56,10 @@ def test_validate_config():
 
 
 def test_defaults():
-    assert 'p-run foo' == apply_default(cmd='p-run', cfg=dict(defaults={'p run': 'foo'}))
-
+    assert 'p-run foo' == apply_default(cmd_name='p', cmd='p-run', cfg=dict(defaults={'p run': 'foo'}))
+    assert 'p-run foo' == apply_default(cmd_name='p', cmd='p-run', cfg=dict(project_type='python', defaults={'p run': 'foo'}))
     assert 'p-run foo' == alias_and_resolve(cmd_name='p', cmd='p run', available_commands=['p-run'], cfg=dict(defaults={'p run': 'foo'}))
+    assert 'p-python-run foo' == alias_and_resolve(cmd_name='p', cmd='p run', available_commands=['p-python-run'], cfg=dict(project_type='python', defaults={'p run': 'foo'}))
 
 
 def test_autodetect_python():

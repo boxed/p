@@ -37,10 +37,10 @@ def alias_project_type(*, cmd_name, cmd, cfg):
 
 def alias_once(*, cmd_name, cmd, cfg):
     aliases = {
-        alias_project_type(cmd_name=cmd_name, cmd=k, cfg=cfg): alias_project_type(cmd_name=cmd_name, cmd=v, cfg=cfg)
+        alias_project_type(cmd_name=cmd_name, cmd=k, cfg=cfg): apply_default(cmd_name=cmd_name, cmd=alias_project_type(cmd_name=cmd_name, cmd=v, cfg=cfg), cfg=cfg)
         for k, v in cfg.get('aliases', {}).items()
     }
-    cmd = alias_project_type(cmd_name=cmd_name, cmd=cmd, cfg=cfg)
+    cmd = alias_project_type(cmd_name=cmd_name, cmd=apply_default(cmd_name=cmd_name, cmd=cmd, cfg=cfg), cfg=cfg)
     for k, v in aliases.items():
         if cmd.startswith(k):
             new_cmd = v + cmd[len(k):]
@@ -69,20 +69,23 @@ def resolve_cmd(*, available_commands, cmd):
         return ' '.join([prefix] + command)
 
 
-def apply_default(*, cmd, cfg):
+def apply_default(*, cmd_name, cmd, cfg):
     if cmd is None:
         return None
-    default = cfg.get('defaults', {}).get(cmd.replace('-', ' '), None)
-    return f'{cmd} {default}' if default else cmd
+    cmd_with_project_type = alias_project_type(cmd_name=cmd_name, cmd=cmd.replace('-', ' '), cfg=cfg)
+    default = cfg.get('defaults', {}).get(cmd_with_project_type, None)
+    if default is None and cmd_with_project_type != cmd:
+        default = cfg.get('defaults', {}).get(cmd.replace('-', ' '), None)
+        return f'{cmd} {default}' if default else cmd
+    else:
+        return f'{cmd} {default}' if default else cmd
 
 
 def alias_and_resolve(*, cmd_name, cmd, available_commands, cfg):
     if cmd_name in available_commands:
         available_commands.remove(cmd_name)  # avoid circular lookup
     cmd = alias(cmd_name=cmd_name, cmd=cmd, cfg=cfg)
-    resolved_cmd = resolve_cmd(available_commands=available_commands, cmd=cmd)
-    resolved_cmd_with_default = apply_default(cmd=resolved_cmd, cfg=cfg)
-    return resolved_cmd_with_default
+    return resolve_cmd(available_commands=available_commands, cmd=cmd)
 
 
 class ConfigError(Exception):
