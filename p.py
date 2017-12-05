@@ -23,6 +23,30 @@ def find_available_commands():
     return set(r)
 
 
+class Node:
+    def __init__(self, *, parent=None, name: str, defaults: str=None, children=None):
+        self.parent = parent
+        self.name = name
+        self.defaults = defaults
+        self.children = children or {}
+
+    def __repr__(self):
+        return f'Node({self.name})'
+
+
+cmd_root_node = Node(name='__commands__')
+
+
+def parse_cmd_string_into_node(cmd_string: str) -> Node:
+    cmd_parts = cmd_string.split(' ')
+    i = cmd_root_node
+    for part in cmd_parts:
+        if part not in i.children:
+            i.children[part] = Node(name=part, parent=i)
+        i = i.children[part]
+    return i
+
+
 def alias_project_type(*, cmd_name, cmd, cfg):
     assert not cmd.startswith(cmd_name + '-')
     if not cmd.startswith(cmd_name + ' '):

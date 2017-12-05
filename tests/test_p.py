@@ -1,7 +1,7 @@
 import pytest
 
 from p import validate_config, ConfigError, resolve_cmd, alias_and_resolve, alias, alias_once, alias_project_type, \
-    apply_default, auto_detect_project_type
+    apply_default, auto_detect_project_type, parse_cmd_string_into_node
 
 
 def test_alias_project_type():
@@ -60,6 +60,18 @@ def test_defaults():
     assert 'p-run foo' == apply_default(cmd_name='p', cmd='p-run', cfg=dict(project_type='python', defaults={'p run': 'foo'}))
     assert 'p-run foo' == alias_and_resolve(cmd_name='p', cmd='p run', available_commands=['p-run'], cfg=dict(defaults={'p run': 'foo'}))
     assert 'p-python-run foo' == alias_and_resolve(cmd_name='p', cmd='p run', available_commands=['p-python-run'], cfg=dict(project_type='python', defaults={'p run': 'foo'}))
+
+
+def test_parse_cmd_string_into_node():
+    import p
+    p.cmd_root_node.children = {}
+    assert parse_cmd_string_into_node('p run foo').name == 'foo'
+    assert 'p' in p.cmd_root_node.children
+    assert 'run' in p.cmd_root_node.children['p'].children
+    assert 'foo' in p.cmd_root_node.children['p'].children['run'].children
+    assert p.cmd_root_node.children['p'].parent == p.cmd_root_node
+    assert p.cmd_root_node.children['p'].children['run'].parent == p.cmd_root_node.children['p']
+    assert p.cmd_root_node.children['p'].children['run'].children['foo'].parent == p.cmd_root_node.children['p'].children['run']
 
 
 def test_autodetect_python():
