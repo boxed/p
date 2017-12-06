@@ -1,7 +1,7 @@
 import pytest
 
 from p import validate_config, ConfigError, resolve_cmd, alias_and_resolve, alias, alias_once, alias_project_type, \
-    apply_default, auto_detect_project_type, cmd_parts_into_node
+    apply_default, auto_detect_project_type, cmd_parts_into_node, Node
 
 
 def test_alias_project_type():
@@ -63,15 +63,14 @@ def test_defaults():
 
 
 def test_cmd_parts_into_node():
-    import p
-    p.cmd_root_node.children = {}
-    assert cmd_parts_into_node(['p', 'run', 'foo']).name == 'foo'
-    assert 'p' in p.cmd_root_node.children
-    assert 'run' in p.cmd_root_node.children['p'].children
-    assert 'foo' in p.cmd_root_node.children['p'].children['run'].children
-    assert p.cmd_root_node.children['p'].parent == p.cmd_root_node
-    assert p.cmd_root_node.children['p'].children['run'].parent == p.cmd_root_node.children['p']
-    assert p.cmd_root_node.children['p'].children['run'].children['foo'].parent == p.cmd_root_node.children['p'].children['run']
+    root_node = Node(name='__root__')
+    assert cmd_parts_into_node(root_node, ['p', 'run', 'foo']).name == 'foo'
+    assert 'p' in root_node.children
+    assert 'run' in root_node.children['p'].children
+    assert 'foo' in root_node.children['p'].children['run'].children
+    assert root_node.children['p'].parent == root_node
+    assert root_node.children['p'].children['run'].parent == root_node.children['p']
+    assert root_node.children['p'].children['run'].children['foo'].parent == root_node.children['p'].children['run']
 
 
 def test_autodetect_python():
@@ -86,7 +85,7 @@ def test_autodetect_python():
         'AUTHORS.rst',
         'CONTRIBUTING.rst',
         'HISTORY.rst',
-        'LICENSE	tri',
+        'LICENSE',
         'MANIFEST.in',
         'Makefile',
         'README.rst',

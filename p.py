@@ -35,11 +35,8 @@ class Node:
         return f'Node({self.name})'
 
 
-cmd_root_node = Node(name='__commands__')
-
-
-def cmd_parts_into_node(cmd_parts: List[str]) -> Node:
-    i = cmd_root_node
+def cmd_parts_into_node(root_node: Node, cmd_parts: List[str]) -> Node:
+    i = root_node
     for part in cmd_parts:
         if part not in i.children:
             i.children[part] = Node(name=part, parent=i)
