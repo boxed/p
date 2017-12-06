@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+from typing import List
 
 
 def auto_detect_project_type(*, filenames):
@@ -37,8 +38,7 @@ class Node:
 cmd_root_node = Node(name='__commands__')
 
 
-def parse_cmd_string_into_node(cmd_string: str) -> Node:
-    cmd_parts = cmd_string.split(' ')
+def cmd_parts_into_node(cmd_parts: List[str]) -> Node:
     i = cmd_root_node
     for part in cmd_parts:
         if part not in i.children:
