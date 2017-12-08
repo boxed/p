@@ -1,15 +1,28 @@
 import pytest
 
 from p import validate_config, ConfigError, resolve_cmd, alias_and_resolve, alias, alias_once, alias_project_type, \
-    apply_default, auto_detect_project_type, cmd_parts_into_node, Node
+    auto_detect_project_type, cmd_parts_into_node, Node
+
+
+def test_cmd_parts_into_node():
+    root_node = Node(name='__root__')
+    assert cmd_parts_into_node(root_node, ['p', 'run', 'foo']).name == 'foo'
+    assert 'p' in root_node.children
+    assert 'run' in root_node.children['p'].children
+    assert 'foo' in root_node.children['p'].children['run'].children
+    assert root_node.children['p'].parent == root_node
+    assert root_node.children['p'].children['run'].parent == root_node.children['p']
+    assert root_node.children['p'].children['run'].children['foo'].parent == root_node.children['p'].children['run']
 
 
 def test_alias_project_type():
-    assert alias_project_type(cmd_name='p', cmd='p repl', cfg=dict(project_type='python')) == 'p python repl'
+    assert alias_project_type(cmd_parts=['p', 'repl'], cfg=dict(project_type='python')) == ['p', 'python', 'repl']
 
-    assert alias_project_type(cmd_name='p', cmd='p python repl', cfg=dict(project_type='python')) == 'p python repl'
+    with pytest.raises(AssertionError):
+        alias_project_type(cmd_parts=['p', 'python', 'repl'], cfg=dict(project_type='python'))
 
-    assert alias_project_type(cmd_name='p', cmd='foo bar', cfg={}) == 'foo bar'
+    with pytest.raises(AssertionError):
+        alias_project_type(cmd_parts=['foo', 'bar'], cfg={})
 
 
 def test_alias_once1():
@@ -60,17 +73,6 @@ def test_defaults():
     assert 'p-run foo' == apply_default(cmd_name='p', cmd='p-run', cfg=dict(project_type='python', defaults={'p run': 'foo'}))
     assert 'p-run foo' == alias_and_resolve(cmd_name='p', cmd='p run', available_commands=['p-run'], cfg=dict(defaults={'p run': 'foo'}))
     assert 'p-python-run foo' == alias_and_resolve(cmd_name='p', cmd='p run', available_commands=['p-python-run'], cfg=dict(project_type='python', defaults={'p run': 'foo'}))
-
-
-def test_cmd_parts_into_node():
-    root_node = Node(name='__root__')
-    assert cmd_parts_into_node(root_node, ['p', 'run', 'foo']).name == 'foo'
-    assert 'p' in root_node.children
-    assert 'run' in root_node.children['p'].children
-    assert 'foo' in root_node.children['p'].children['run'].children
-    assert root_node.children['p'].parent == root_node
-    assert root_node.children['p'].children['run'].parent == root_node.children['p']
-    assert root_node.children['p'].children['run'].children['foo'].parent == root_node.children['p'].children['run']
 
 
 def test_autodetect_python():
