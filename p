@@ -34,7 +34,7 @@ def main(argv):
     available_commands = find_available_commands()
     command = alias_and_resolve(
         cmd_name=cmd_name,
-        cmd=' '.join([cmd_name] + argv[1:]),
+        cmd=(cmd_name, ) + tuple(argv[1:]),
         available_commands=available_commands,
         cfg=cfg,
     )

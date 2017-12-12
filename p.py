@@ -24,27 +24,26 @@ def find_available_commands():
 
 
 def alias_project_type(*, cmd_name, cmd, cfg):
-    assert not cmd.startswith(cmd_name + '-')
-    if not cmd.startswith(cmd_name + ' '):
-        return cmd
-    prefix, *command = cmd.split(' ')
+    assert 'project_type' in cfg
+
+    prefix, *command = cmd
+    assert command[0] != cfg['project_type']
+
     assert prefix == cmd_name
-    if 'project_type' in cfg:
-        if command and command[0] != cfg['project_type']:
-            command = [cfg['project_type']] + command
-    return ' '.join([prefix] + command)
+    command = (cfg['project_type'], ) + tuple(command)
+
+    return (prefix, ) + command
 
 
 def alias_once(*, cmd_name, cmd, cfg):
-    aliases = {
-        alias_project_type(cmd_name=cmd_name, cmd=k, cfg=cfg): apply_default(cmd_name=cmd_name, cmd=alias_project_type(cmd_name=cmd_name, cmd=v, cfg=cfg), cfg=cfg)
-        for k, v in cfg.get('aliases', {}).items()
-    }
-    cmd = alias_project_type(cmd_name=cmd_name, cmd=apply_default(cmd_name=cmd_name, cmd=cmd, cfg=cfg), cfg=cfg)
-    for k, v in aliases.items():
-        if cmd.startswith(k):
-            new_cmd = v + cmd[len(k):]
-            return alias_project_type(cmd_name=cmd_name, cmd=new_cmd, cfg=cfg)
+    if 'aliases' not in cfg:
+        return cmd
+
+    aliases = cfg['aliases']
+    for c in reversed(range(1, len(cmd) + 1)):
+        try_command = cmd[:c]
+        if try_command in aliases:
+            return aliases[try_command] + cmd[c:]
     return cmd
 
 
@@ -56,36 +55,47 @@ def alias(*, cmd_name, cmd, cfg):
         return alias(cmd_name=cmd_name, cmd=new_cmd, cfg=cfg)
 
 
-def resolve_cmd(*, available_commands, cmd):
-    prefix, *command = cmd.split(' ')
+def resolve_cmd(*, available_commands, cmd_name, cmd, cfg):
+    validate_config(cfg=cfg)
+    default = cfg.get('defaults', {}).get(cmd)
+
+    r = None
+    if 'project_type' in cfg:
+        r = _resolve_cmd(available_commands=available_commands, cmd=alias_project_type(cmd_name=cmd_name, cmd=cmd, cfg=cfg))
+
+    if r is None:
+        r = _resolve_cmd(available_commands=available_commands, cmd=cmd)
+
+    if default:
+        return f'{r} {default}'
+    else:
+        return r
+
+
+def _resolve_cmd(*, available_commands, cmd):
+    prefix, *command = cmd
     if '/' in prefix:
-        return cmd
+        return ' '.join(cmd)
+
     for c in reversed(range(1, len(command) + 1)):
         try_command = '-'.join([prefix] + command[:c])
         if try_command in available_commands:
             params = command[c:]
             return ' '.join([try_command] + params)
+
     if prefix in available_commands:
         return ' '.join([prefix] + command)
 
 
-def apply_default(*, cmd_name, cmd, cfg):
-    if cmd is None:
-        return None
-    cmd_with_project_type = alias_project_type(cmd_name=cmd_name, cmd=cmd.replace('-', ' '), cfg=cfg)
-    default = cfg.get('defaults', {}).get(cmd_with_project_type, None)
-    if default is None and cmd_with_project_type != cmd:
-        default = cfg.get('defaults', {}).get(cmd.replace('-', ' '), None)
-        return f'{cmd} {default}' if default else cmd
-    else:
-        return f'{cmd} {default}' if default else cmd
-
-
 def alias_and_resolve(*, cmd_name, cmd, available_commands, cfg):
+    if len(cmd) == 1:
+        cmd += ('help', )
+
+    assert isinstance(cmd, tuple)
     if cmd_name in available_commands:
         available_commands.remove(cmd_name)  # avoid circular lookup
     cmd = alias(cmd_name=cmd_name, cmd=cmd, cfg=cfg)
-    return resolve_cmd(available_commands=available_commands, cmd=cmd)
+    return resolve_cmd(available_commands=available_commands, cmd_name=cmd_name, cmd=cmd, cfg=cfg)
 
 
 class ConfigError(Exception):
@@ -100,3 +110,7 @@ def validate_config(*, cfg):
         for a in aliases.keys():
             if '-' in a:
                 raise ConfigError('Aliases should be written in the form "foo bar", not "fo-bar". Incorrect value "%s"' % a)
+    if 'defaults' in cfg:
+        for k in cfg['defaults']:
+            if not isinstance(k, tuple):
+                raise ConfigError('Defaults must be tuples, %r is not' % k)

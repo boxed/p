@@ -1,50 +1,54 @@
 import pytest
 
 from p import validate_config, ConfigError, resolve_cmd, alias_and_resolve, alias, alias_once, alias_project_type, \
-    apply_default, auto_detect_project_type
+    auto_detect_project_type
 
 
 def test_alias_project_type():
-    assert alias_project_type(cmd_name='p', cmd='p repl', cfg=dict(project_type='python')) == 'p python repl'
+    assert alias_project_type(cmd_name='p', cmd=('p', 'repl'), cfg=dict(project_type='python')) == ('p', 'python', 'repl')
 
-    assert alias_project_type(cmd_name='p', cmd='p python repl', cfg=dict(project_type='python')) == 'p python repl'
+    with pytest.raises(AssertionError):
+        # alias already applied
+        alias_project_type(cmd_name='p', cmd=('p', 'python', 'repl'), cfg=dict(project_type='python'))
 
-    assert alias_project_type(cmd_name='p', cmd='foo bar', cfg={}) == 'foo bar'
+    with pytest.raises(AssertionError):
+        # no project_type
+        alias_project_type(cmd_name='p', cmd=('foo', 'bar'), cfg={})
 
 
 def test_alias_once1():
-    assert 'p python repl' == alias_once(cmd_name='p', cmd='p repl', cfg=dict(project_type='python'))
+    assert ('p', 'repl') == alias_once(cmd_name='p', cmd=('p', 'repl'), cfg=dict())
 
 
 def test_alias_once2():
-    assert 'p python run manage.py shell' == alias_once(cmd_name='p', cmd='p repl', cfg=dict(project_type='python', aliases={'p python repl': 'p python run manage.py shell'}))
+    assert ('p', 'run', 'manage.py', 'shell') == alias_once(cmd_name='p', cmd=('p', 'repl'), cfg=dict(aliases={('p', 'repl'): ('p', 'run', 'manage.py', 'shell')}))
 
 
 def test_alias_once3():
-    assert 'p python run manage.py shell' == alias_once(cmd_name='p', cmd='p repl', cfg=dict(project_type='python', aliases={'p repl': 'p run manage.py shell'}))
+    assert ('p', 'run', 'manage.py', 'shell') == alias_once(cmd_name='p', cmd=('p', 'repl'), cfg=dict(aliases={('p', 'repl'): ('p', 'run', 'manage.py', 'shell')}))
 
 
 def test_alias_once4():
-    assert 'python manage.py shell' == alias_once(cmd_name='p', cmd='p python run manage.py shell', cfg=dict(project_type='python', aliases={'p python run': 'python'}))
+    assert ('python', 'manage.py', 'shell') == alias_once(cmd_name='p', cmd=('p', 'python', 'run', 'manage.py', 'shell'), cfg=dict(aliases={('p', 'python', 'run'): ('python', )}))
 
 
 def test_alias():
-    assert 'python manage.py shell' == alias(cmd_name='p', cmd='p repl', cfg=dict(project_type='python', aliases={
-        'p repl': 'p run manage.py shell',
-        'p python run': 'python',
+    assert ('python', 'manage.py', 'shell') == alias(cmd_name='p', cmd=('p', 'repl'), cfg=dict(aliases={
+        ('p', 'repl'): ('p', 'run', 'manage.py', 'shell'),
+        ('p', 'run'): ('python', ),
     }))
 
 
 def test_resolve():
-    assert resolve_cmd(available_commands=['p-new', ], cmd='p new python foo') == 'p-new python foo'
-    assert resolve_cmd(available_commands=['p-new', 'p-new-python'], cmd='p new python foo') == 'p-new-python foo'
-    assert resolve_cmd(available_commands=[], cmd='p new python foo') is None
-    assert resolve_cmd(available_commands=['p-help', ], cmd='p help') == 'p-help'
-    assert resolve_cmd(available_commands=[], cmd='foo/bar/baz') == 'foo/bar/baz'
+    assert resolve_cmd(available_commands=['p-new', ], cmd_name='p', cmd=('p', 'new', 'python', 'foo'), cfg={}) == 'p-new python foo'
+    assert resolve_cmd(available_commands=['p-new', 'p-new-python'], cmd_name='p', cmd=('p', 'new', 'python', 'foo'), cfg={}) == 'p-new-python foo'
+    assert resolve_cmd(available_commands=[], cmd_name='p', cmd=('p', 'new', 'python', 'foo'), cfg={}) is None
+    assert resolve_cmd(available_commands=['p-help', ], cmd_name='p', cmd=('p', 'help'), cfg={}) == 'p-help'
+    assert resolve_cmd(available_commands=[], cmd_name='p', cmd=('foo/bar/baz', ), cfg={}) == 'foo/bar/baz'
 
 
 def test_alias_and_resolve():
-    assert 'python manage.py shell' == alias_and_resolve(cmd_name='p', cmd='p repl', available_commands=['python'], cfg=dict(project_type='python', aliases={'p repl': 'p run manage.py shell', 'p python run': 'python'}))
+    assert 'python manage.py shell' == alias_and_resolve(cmd_name='p', cmd=('p', 'repl'), available_commands=['python'], cfg=dict(aliases={('p', 'repl'): ('p', 'run', 'manage.py', 'shell'), ('p', 'run'): ('python', )}))
 
 
 def test_validate_config():
@@ -56,10 +60,21 @@ def test_validate_config():
 
 
 def test_defaults():
-    assert 'p-run foo' == apply_default(cmd_name='p', cmd='p-run', cfg=dict(defaults={'p run': 'foo'}))
-    assert 'p-run foo' == apply_default(cmd_name='p', cmd='p-run', cfg=dict(project_type='python', defaults={'p run': 'foo'}))
-    assert 'p-run foo' == alias_and_resolve(cmd_name='p', cmd='p run', available_commands=['p-run'], cfg=dict(defaults={'p run': 'foo'}))
-    assert 'p-python-run foo' == alias_and_resolve(cmd_name='p', cmd='p run', available_commands=['p-python-run'], cfg=dict(project_type='python', defaults={'p run': 'foo'}))
+    assert 'p-run foo' == alias_and_resolve(cmd_name='p', cmd=('p', 'run'), available_commands=['p-run'], cfg=dict(defaults={('p', 'run'): 'foo'}))
+    assert 'p-run foo' == alias_and_resolve(cmd_name='p', cmd=('p', 'run'), available_commands=['p-run'], cfg=dict(defaults={('p', 'run'): 'foo'}))
+    assert 'p-python-run foo' == alias_and_resolve(cmd_name='p', cmd=('p', 'run'), available_commands=['p-python-run'], cfg=dict(project_type='python', defaults={('p', 'run'): 'foo'}))
+
+
+def test_fallback_to_non_project_specific_command():
+    assert 'p-new foo' == alias_and_resolve(
+        cmd_name='p',
+        cmd=('p', 'new', 'foo'),
+        available_commands=['p-new'],
+        cfg=dict(
+            project_type='python',
+            aliases={},
+        )
+    )
 
 
 def test_autodetect_python():
