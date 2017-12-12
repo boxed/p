@@ -1,7 +1,9 @@
+from configparser import ConfigParser
+
 import pytest
 
 from p import validate_config, ConfigError, resolve_cmd, alias_and_resolve, alias, alias_once, alias_project_type, \
-    auto_detect_project_type
+    auto_detect_project_type, parse_cfg
 
 
 def test_alias_project_type():
@@ -17,19 +19,19 @@ def test_alias_project_type():
 
 
 def test_alias_once1():
-    assert ('p', 'repl') == alias_once(cmd_name='p', cmd=('p', 'repl'), cfg=dict())
+    assert ('p', 'repl') == alias_once(cmd=('p', 'repl'), cfg=dict())
 
 
 def test_alias_once2():
-    assert ('p', 'run', 'manage.py', 'shell') == alias_once(cmd_name='p', cmd=('p', 'repl'), cfg=dict(aliases={('p', 'repl'): ('p', 'run', 'manage.py', 'shell')}))
+    assert ('p', 'run', 'manage.py', 'shell') == alias_once(cmd=('p', 'repl'), cfg=dict(aliases={('p', 'repl'): ('p', 'run', 'manage.py', 'shell')}))
 
 
 def test_alias_once3():
-    assert ('p', 'run', 'manage.py', 'shell') == alias_once(cmd_name='p', cmd=('p', 'repl'), cfg=dict(aliases={('p', 'repl'): ('p', 'run', 'manage.py', 'shell')}))
+    assert ('p', 'run', 'manage.py', 'shell') == alias_once(cmd=('p', 'repl'), cfg=dict(aliases={('p', 'repl'): ('p', 'run', 'manage.py', 'shell')}))
 
 
 def test_alias_once4():
-    assert ('python', 'manage.py', 'shell') == alias_once(cmd_name='p', cmd=('p', 'python', 'run', 'manage.py', 'shell'), cfg=dict(aliases={('p', 'python', 'run'): ('python', )}))
+    assert ('python', 'manage.py', 'shell') == alias_once(cmd=('p', 'python', 'run', 'manage.py', 'shell'), cfg=dict(aliases={('p', 'python', 'run'): ('python',)}))
 
 
 def test_alias():
@@ -55,8 +57,45 @@ def test_validate_config():
     with pytest.raises(ConfigError):
         validate_config(cfg=dict(project_type=' foo bar'))
 
+    # internal data model tests
     with pytest.raises(ConfigError):
         validate_config(cfg=dict(aliases={'foo-bar': 'bar-baz'}))
+
+    with pytest.raises(ConfigError):
+        validate_config(cfg=dict(defaults={'foo-bar': 'bar-baz'}))
+
+    # config file is invalid
+    with pytest.raises(ConfigError):
+        validate_config(cfg=dict(aliases={('foo-bar',): 'bar-baz'}))
+
+    with pytest.raises(ConfigError):
+        validate_config(cfg=dict(defaults={('foo-bar',): 'bar-baz'}))
+
+
+def test_parse_cfg():
+    config_parser = ConfigParser()
+    config_parser.read_string("""
+[general]
+project_type=python
+
+[aliases]
+p foo=p bar
+p baz=p quux
+
+[defaults]
+p foo=asd
+    """.strip())
+    assert parse_cfg(config_parser=config_parser) == {
+        'project_type': 'python',
+        'aliases': {
+            ('p', 'baz'): 'p quux',
+            ('p', 'foo'): 'p bar',
+        },
+        'defaults': {
+            ('p', 'foo'): 'asd',
+        },
+    }
+
 
 
 def test_defaults():

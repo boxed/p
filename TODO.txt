@@ -1,4 +1,8 @@
 * autodetect project type for top 10 languages
-* p-new-python
-* p-python-install: ask to add to requirements.txt
-* p-python-upload
+* auto install requirements for autodetected languages
+* p-*-new for detected languages
+
+* Python specific:
+    * p-new-python
+    * p-python-install: ask to add to requirements.txt
+    * p-python-upload

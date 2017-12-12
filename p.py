@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+from configparser import ConfigParser
 
 
 def auto_detect_project_type(*, filenames):
@@ -35,7 +36,7 @@ def alias_project_type(*, cmd_name, cmd, cfg):
     return (prefix, ) + command
 
 
-def alias_once(*, cmd_name, cmd, cfg):
+def alias_once(*, cmd, cfg):
     if 'aliases' not in cfg:
         return cmd
 
@@ -48,7 +49,7 @@ def alias_once(*, cmd_name, cmd, cfg):
 
 
 def alias(*, cmd_name, cmd, cfg):
-    new_cmd = alias_once(cmd_name=cmd_name, cmd=cmd, cfg=cfg)
+    new_cmd = alias_once(cmd=cmd, cfg=cfg)
     if new_cmd == cmd:
         return cmd
     else:
@@ -107,10 +108,43 @@ def validate_config(*, cfg):
         raise ConfigError('project_type cannot contain spaces')
     if 'aliases' in cfg:
         aliases = cfg['aliases']
-        for a in aliases.keys():
-            if '-' in a:
-                raise ConfigError('Aliases should be written in the form "foo bar", not "fo-bar". Incorrect value "%s"' % a)
+
+        for k in aliases:
+            if not isinstance(k, tuple):
+                raise ConfigError('Aliases must be tuples, %r is not' % k)
+
+        for k in aliases.keys():
+            if '-' in k[0]:
+                raise ConfigError('Aliases should be written in the form "foo bar", not "fo-bar". Incorrect value "%s"' % k)
     if 'defaults' in cfg:
-        for k in cfg['defaults']:
+        for k in cfg['defaults'].keys():
+            if '-' in k[0]:
+                raise ConfigError('Defaults should be written in the form "foo bar", not "fo-bar". Incorrect value "%s"' % k)
             if not isinstance(k, tuple):
                 raise ConfigError('Defaults must be tuples, %r is not' % k)
+
+
+def read_cfg(*, cmd_name):
+    filename = '.%s-config' % cmd_name
+    config_parser = ConfigParser()
+    config_parser.read([filename, os.path.expanduser('~/' + filename)], encoding='utf8')
+    return parse_cfg(config_parser=config_parser)
+
+
+def parse_cfg(*, config_parser):
+    cfg = {}
+    if config_parser.has_section('general'):
+        cfg.update(dict(config_parser.items('general')))
+
+    def parse_tuple_key_dict(key):
+        if config_parser.has_section(key):
+            d = {
+                tuple(k.split(' ')): v
+                for k, v in config_parser.items(key)
+            }
+            cfg[key] = d
+
+    parse_tuple_key_dict('aliases')
+    parse_tuple_key_dict('defaults')
+    validate_config(cfg=cfg)
+    return cfg

@@ -1,24 +1,9 @@
 #!/usr/bin/env python3
 
 import os
-from configparser import ConfigParser
 from subprocess import call
 
-from p import find_available_commands, alias_and_resolve, auto_detect_project_type
-
-
-def read_cfg(*, cmd_name):
-    filename = '.%s-config' % cmd_name
-    config = ConfigParser()
-    config.read([filename, os.path.expanduser('~/' + filename)], encoding='utf8')
-    r = {}
-    if config.has_section('general'):
-        r.update(dict(config.items('general')))
-    if config.has_section('aliases'):
-        r['aliases'] = dict(config.items('aliases'))
-    if config.has_section('defaults'):
-        r['defaults'] = dict(config.items('defaults'))
-    return r
+from p import find_available_commands, alias_and_resolve, auto_detect_project_type, read_cfg
 
 
 def main(argv):
