@@ -42,7 +42,7 @@ def main(argv):
         print('Unknown command. Available commands:')
         for c in available_commands:
             if c.startswith('%s-' % cmd_name):
-                print('\t', c)
+                print('\t', c.replace('-', ' '))
     else:
         exit(call(command, shell=True, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr))
 
