@@ -6,15 +6,16 @@ from configparser import ConfigParser
 
 def auto_detect_project_type(*, filenames):
     simple_filename_tells = dict(
-        python='requirements.txt',
-        elm='elm-package.json',
-        clojure='project.clj',
-        swift='Package.swift',
-        java='pom.xml',
+        python=['requirements.txt', 'setup.py'],
+        elm=['elm-package.json'],
+        clojure=['project.clj'],
+        swift=['Package.swift'],
+        java=['pom.xml'],
     )
-    for language, filename in simple_filename_tells.items():
-        if filename in filenames:
-            return language
+    for language, x in simple_filename_tells.items():
+        for filename in x:
+            if filename in filenames:
+                return language
 
 
 def find_available_commands():

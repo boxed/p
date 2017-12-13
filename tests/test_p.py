@@ -147,6 +147,12 @@ def test_autodetect_python():
     ])
 
 
+def test_autodetect_python2():
+    assert 'python' == auto_detect_project_type(filenames=[
+        'setup.py',
+    ])
+
+
 def test_autodetect_elm():
     assert 'elm' == auto_detect_project_type(filenames=[
         'src/',
