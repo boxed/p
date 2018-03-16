@@ -2,7 +2,7 @@
 import os
 from subprocess import check_output
 
-possible = ['.venv', '.env', 'venv', 'env']
+possible = ['.venv', '.env', 'venv', 'env', '.venv3', '.env3', 'venv3', 'env3']
 
 for p in possible:
     if os.path.exists(p) and os.path.isdir(p):

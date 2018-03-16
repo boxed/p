@@ -24,6 +24,10 @@ def main(argv):
         cfg=cfg,
     )
     if command is None:
+        if 'project_type' in cfg:
+            print('Project type: %s' % cfg['project_type'])
+        else:
+            print('Unknown project type')
         print('Unknown command. Available commands:')
         for c in available_commands:
             if c.startswith('%s-' % cmd_name):

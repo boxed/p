@@ -6,7 +6,7 @@ from configparser import ConfigParser
 
 def auto_detect_project_type(*, filenames):
     simple_filename_tells = dict(
-        python=['requirements.txt', 'setup.py'],
+        python=['requirements.txt', 'setup.py', 'setup.cfg'],
         elm=['elm-package.json'],
         clojure=['project.clj'],
         swift=['Package.swift'],
@@ -146,6 +146,9 @@ def parse_cfg(*, config_parser):
             cfg[key] = d
 
     parse_tuple_key_dict('aliases')
+    if 'aliases' in cfg:
+        cfg['aliases'] = {k: tuple(v.split(' ')) for k, v in cfg['aliases'].items()}
+
     parse_tuple_key_dict('defaults')
     validate_config(cfg=cfg)
     return cfg

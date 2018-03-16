@@ -88,8 +88,8 @@ p foo=asd
     assert parse_cfg(config_parser=config_parser) == {
         'project_type': 'python',
         'aliases': {
-            ('p', 'baz'): 'p quux',
-            ('p', 'foo'): 'p bar',
+            ('p', 'baz'): ('p', 'quux'),
+            ('p', 'foo'): ('p', 'bar'),
         },
         'defaults': {
             ('p', 'foo'): 'asd',
