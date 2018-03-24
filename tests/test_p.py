@@ -1,9 +1,11 @@
 from configparser import ConfigParser
 
+import os
 import pytest
+from shutil import rmtree
 
 from p import validate_config, ConfigError, resolve_cmd, alias_and_resolve, alias, alias_once, alias_project_type, \
-    auto_detect_project_type, parse_cfg
+    auto_detect_project_type, parse_cfg, find_available_commands
 
 
 def test_alias_project_type():
@@ -97,7 +99,6 @@ p foo=asd
     }
 
 
-
 def test_defaults():
     assert 'p-run foo' == alias_and_resolve(cmd_name='p', cmd=('p', 'run'), available_commands=['p-run'], cfg=dict(defaults={('p', 'run'): 'foo'}))
     assert 'p-run foo' == alias_and_resolve(cmd_name='p', cmd=('p', 'run'), available_commands=['p-run'], cfg=dict(defaults={('p', 'run'): 'foo'}))
@@ -116,8 +117,26 @@ def test_fallback_to_non_project_specific_command():
     )
 
 
+def auto_detect_project_type_tester(filenames):
+    rmtree('test_tmp', ignore_errors=True)
+    os.mkdir('test_tmp')
+
+    os.chdir('test_tmp')
+    try:
+        for filename in filenames:
+            if filename.endswith('/'):
+                os.mkdir(filename)
+            else:
+                with open(filename, 'w') as f:
+                    pass
+
+        return auto_detect_project_type(cmd_name='p', available_commands=find_available_commands())
+    finally:
+        os.chdir('..')
+
+
 def test_autodetect_python():
-    assert 'python' == auto_detect_project_type(filenames=[
+    assert 'python' == auto_detect_project_type_tester(filenames=[
         'docs/',
         'examples/',
         'lib/',
@@ -148,13 +167,13 @@ def test_autodetect_python():
 
 
 def test_autodetect_python2():
-    assert 'python' == auto_detect_project_type(filenames=[
+    assert 'python' == auto_detect_project_type_tester(filenames=[
         'setup.py',
     ])
 
 
 def test_autodetect_elm():
-    assert 'elm' == auto_detect_project_type(filenames=[
+    assert 'elm' == auto_detect_project_type_tester(filenames=[
         'src/',
         'tests/',
         '.gitignore',
@@ -166,7 +185,7 @@ def test_autodetect_elm():
 
 
 def test_autodetect_clojure():
-    assert 'clojure' == auto_detect_project_type(filenames=[
+    assert 'clojure' == auto_detect_project_type_tester(filenames=[
         'config/',
         'pkg/',
         'resources/',
@@ -185,7 +204,7 @@ def test_autodetect_clojure():
 
 
 def test_autodetect_swift():
-    assert 'swift' == auto_detect_project_type(filenames=[
+    assert 'swift' == auto_detect_project_type_tester(filenames=[
         'Alamofire.xcodeproj/',
         'Alamofire.xcworkspace/',
         'Documentation/',
@@ -214,7 +233,7 @@ def test_autodetect_swift():
 
 
 def test_autodetect_java():
-    assert 'java' == auto_detect_project_type(filenames=[
+    assert 'java' == auto_detect_project_type_tester(filenames=[
         '.buildscript/',
         '.github/',
         'benchmarks/',

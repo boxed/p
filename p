@@ -12,7 +12,7 @@ def main(argv):
 
     cfg = read_cfg(cmd_name=cmd_name)
     if 'project_type' not in cfg:
-        detected_project_type = auto_detect_project_type(filenames=os.listdir('.'))
+        detected_project_type = auto_detect_project_type(cmd_name=cmd_name, available_commands=find_available_commands())
         if detected_project_type:
             cfg['project_type'] = detected_project_type
 

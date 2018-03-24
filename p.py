@@ -2,20 +2,28 @@
 
 import os
 from configparser import ConfigParser
+from subprocess import check_output, CalledProcessError
 
 
-def auto_detect_project_type(*, filenames):
-    simple_filename_tells = dict(
-        python=['requirements.txt', 'setup.py', 'setup.cfg'],
-        elm=['elm-package.json'],
-        clojure=['project.clj'],
-        swift=['Package.swift'],
-        java=['pom.xml'],
-    )
-    for language, x in simple_filename_tells.items():
-        for filename in x:
-            if filename in filenames:
-                return language
+def auto_detect_project_type(*, cmd_name, available_commands):
+    prefix = f'{cmd_name}-projecttype-'
+    commands = [x for x in available_commands if x.startswith(prefix)]
+
+    possible_project_types = []
+
+    for command in commands:
+        try:
+            check_output(command, shell=True)
+            possible_project_types.append(command[len(prefix):])
+        except CalledProcessError:
+            pass
+
+    possible_project_types = list(sorted(possible_project_types))
+    for a, b in zip(possible_project_types, possible_project_types[1:]):
+        if not b.startwith(a):
+            raise Exception(f"Project types that aren't subtypes are not supported. It's not possible to disambiguate them. Found: '{a}' and '{b}'")
+
+    return possible_project_types[-1]
 
 
 def find_available_commands():
