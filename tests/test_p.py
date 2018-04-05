@@ -5,7 +5,7 @@ import pytest
 from shutil import rmtree
 
 from p import validate_config, ConfigError, resolve_cmd, alias_and_resolve, alias, alias_once, alias_project_type, \
-    auto_detect_project_type, parse_cfg, find_available_commands
+    auto_detect_project_type, parse_cfg
 
 
 def test_alias_project_type():
@@ -127,10 +127,10 @@ def auto_detect_project_type_tester(filenames):
             if filename.endswith('/'):
                 os.mkdir(filename)
             else:
-                with open(filename, 'w') as f:
+                with open(filename, 'w'):
                     pass
 
-        return auto_detect_project_type(cmd_name='p', available_commands=find_available_commands())
+        return auto_detect_project_type(cmd_name='p')
     finally:
         os.chdir('..')
 
@@ -147,7 +147,7 @@ def test_autodetect_python():
         'AUTHORS.rst',
         'CONTRIBUTING.rst',
         'HISTORY.rst',
-        'LICENSE	tri',
+        'LICENSE',
         'MANIFEST.in',
         'Makefile',
         'README.rst',

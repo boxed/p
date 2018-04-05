@@ -1,13 +1,32 @@
 #!/usr/bin/env python3
 
 import os
+import re
+from collections import defaultdict
 from configparser import ConfigParser
 from subprocess import check_output, CalledProcessError
 
 
-def auto_detect_project_type(*, cmd_name, available_commands):
+def auto_detect_project_type(*, cmd_name):
     prefix = f'{cmd_name}-projecttype-'
+
+    available_commands = find_available_commands()
+    txt_definitions = read_definitions(cmd_name=cmd_name, suffix='.txt')
+    regex_definitions = read_definitions(cmd_name=cmd_name, suffix='.regex')
+
     commands = [x for x in available_commands if x.startswith(prefix)]
+
+    filenames = set(os.listdir('.'))
+    for key, definitions in txt_definitions.items():
+        for definition in definitions:
+            if definition in filenames:
+                return key
+
+    for key, definitions in regex_definitions.items():
+        for definition in definitions:
+            for filename in filenames:
+                if re.match(definition, filename):
+                    return key
 
     possible_project_types = []
 
@@ -31,6 +50,20 @@ def find_available_commands():
     for path in os.environ["PATH"].split(os.pathsep):
         r.extend([x for x in os.listdir(path) if os.access(os.path.join(path, x), os.X_OK)])
     return set(r)
+
+
+def read_definitions(*, cmd_name, suffix):
+    r = defaultdict(set)
+    prefix = f'{cmd_name}-projecttype-'
+    assert suffix[0] == '.'
+    for path in os.environ["PATH"].split(os.pathsep):
+        for filename in os.listdir(path):
+            if filename.startswith(prefix) and filename.endswith(suffix) and not os.access(os.path.join(path, filename), os.X_OK):
+                project_type = filename[len(prefix):-len(suffix)]
+                with open(os.path.join(path, filename)) as f:
+                    lines = {x.strip() for x in f.readlines()}
+                    r[project_type] |= {x for x in lines if x}
+    return r
 
 
 def alias_project_type(*, cmd_name, cmd, cfg):

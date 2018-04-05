@@ -3,7 +3,7 @@
 import os
 from subprocess import call
 
-from p import find_available_commands, alias_and_resolve, auto_detect_project_type, read_cfg
+from p import find_available_commands, alias_and_resolve, auto_detect_project_type, read_cfg, read_definitions
 
 
 def main(argv):
@@ -12,7 +12,7 @@ def main(argv):
 
     cfg = read_cfg(cmd_name=cmd_name)
     if 'project_type' not in cfg:
-        detected_project_type = auto_detect_project_type(cmd_name=cmd_name, available_commands=find_available_commands())
+        detected_project_type = auto_detect_project_type(cmd_name=cmd_name)
         if detected_project_type:
             cfg['project_type'] = detected_project_type
 
@@ -29,8 +29,10 @@ def main(argv):
         else:
             print('Unknown project type')
         print('Unknown command. Available commands:')
-        for c in available_commands:
-            if c.startswith('%s-' % cmd_name):
+        for c in sorted(available_commands):
+            if c.startswith(f'{cmd_name}-projecttype-'):
+                continue
+            if c.startswith(f'{cmd_name}-'):
                 print('\t', c.replace('-', ' '))
     else:
         exit(call(command, shell=True, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr))
