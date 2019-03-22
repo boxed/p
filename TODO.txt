@@ -6,3 +6,6 @@
     * p-new-python
     * p-python-install: ask to add to requirements.txt
     * p-python-upload
+
+* Makefile support somehow?
+    [x.strip()[:-1] for x in foo if not x.startswith(' ') and x.strip().endswith(':') and not x.startswith('$')]

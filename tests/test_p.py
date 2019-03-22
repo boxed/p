@@ -125,7 +125,7 @@ def test_fallback_to_non_subtype_specific_command():
     )
 
 
-def auto_detect_project_type_tester(filenames):
+def auto_detect_project_type_tester(filenames, **kwargs):
     rmtree('test_tmp', ignore_errors=True)
     os.mkdir('test_tmp')
 
@@ -138,7 +138,7 @@ def auto_detect_project_type_tester(filenames):
                 with open(filename, 'w'):
                     pass
 
-        return auto_detect_project_type(cmd_name='p', paths=os.path.dirname(os.path.dirname(__file__)))
+        return auto_detect_project_type(cmd_name='p', paths=os.path.dirname(os.path.dirname(__file__)), **kwargs)
     finally:
         os.chdir('..')
 
@@ -275,3 +275,7 @@ def test_autodetect_java():
         'deploy_website.sh',
         'pom.xml',
     ])
+
+
+def test_auto_detect_project_type_regex():
+    assert 'foobar' == auto_detect_project_type_tester(filenames=['foobarqueee'], regex_definitions=dict(foobar={'foo.*'}))
