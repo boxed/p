@@ -7,7 +7,8 @@ from subprocess import call
 import hashlib
 
 if len(sys.argv) > 1:
-    # TODO: install a module, ask if we should add it to requirements.txt
+    # TODO: ask if we should add it to requirements.txt
+    exit(call("unset __PYVENV_LAUNCHER__; $(p env_path)/bin/pip install %s" % ' '.join(sys.argv[1:]), shell=True))
     pass
 else:
     if os.path.exists('requirements.txt'):
