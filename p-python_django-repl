@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
+p install
 $(p env_path)/bin/python manage.py shell
