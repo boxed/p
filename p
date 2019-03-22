@@ -3,7 +3,10 @@
 import os
 from subprocess import call
 
-from p import find_available_commands, alias_and_resolve, auto_detect_project_type, read_cfg, read_definitions
+from p import find_available_commands, alias_and_resolve, auto_detect_project_type, read_cfg
+
+
+RECURSION_DEPTH_ENVIRONMENT_VARIABLE = '_P_RECURSION_DEPTH'
 
 
 def main(argv):
@@ -15,6 +18,12 @@ def main(argv):
         detected_project_type = auto_detect_project_type(cmd_name=cmd_name)
         if detected_project_type:
             cfg['project_type'] = detected_project_type
+
+    recursion_depth = int(os.environ.get(RECURSION_DEPTH_ENVIRONMENT_VARIABLE, '0'))
+
+    if recursion_depth > 50:
+        print('ERROR: infinite loop detected')
+        return -1
 
     available_commands = find_available_commands()
     command = alias_and_resolve(
@@ -35,9 +44,18 @@ def main(argv):
             if c.startswith(f'{cmd_name}-'):
                 print('\t', c.replace('-', ' '))
     else:
-        exit(call(command, shell=True, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr))
+        return call(
+            command,
+            shell=True,
+            stdin=sys.stdin,
+            stdout=sys.stdout,
+            stderr=sys.stderr,
+            env={
+                RECURSION_DEPTH_ENVIRONMENT_VARIABLE: str(recursion_depth + 1),
+            },
+        )
 
 
 if __name__ == '__main__':
     import sys
-    main(sys.argv)
+    exit(main(sys.argv))

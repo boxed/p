@@ -7,12 +7,12 @@ from configparser import ConfigParser
 from subprocess import check_output, CalledProcessError
 
 
-def auto_detect_project_type(*, cmd_name):
+def auto_detect_project_type(*, cmd_name, paths=None):
     prefix = f'{cmd_name}-projecttype-'
 
-    available_commands = find_available_commands()
-    txt_definitions = read_definitions(cmd_name=cmd_name, suffix='.txt')
-    regex_definitions = read_definitions(cmd_name=cmd_name, suffix='.regex')
+    available_commands = find_available_commands(paths=paths)
+    txt_definitions = read_definitions(cmd_name=cmd_name, suffix='.txt', paths=paths)
+    regex_definitions = read_definitions(cmd_name=cmd_name, suffix='.regex', paths=paths)
 
     commands = [x for x in available_commands if x.startswith(prefix)]
 
@@ -39,24 +39,31 @@ def auto_detect_project_type(*, cmd_name):
 
     possible_project_types = list(sorted(possible_project_types))
     for a, b in zip(possible_project_types, possible_project_types[1:]):
-        if not b.startwith(a):
+        if not b.startswith(a):
             raise Exception(f"Project types that aren't subtypes are not supported. It's not possible to disambiguate them. Found: '{a}' and '{b}'")
 
-    return possible_project_types[-1]
+    if possible_project_types:
+        return possible_project_types[-1]
+    else:
+        return None
 
 
-def find_available_commands():
+def find_available_commands(*, paths=None):
+    if paths is None:
+        paths = os.environ["PATH"]
     r = []
-    for path in os.environ["PATH"].split(os.pathsep):
-        r.extend([x for x in os.listdir(path) if os.access(os.path.join(path, x), os.X_OK)])
+    for path in paths.split(os.pathsep):
+        r.extend([x for x in os.listdir(path) if os.access(os.path.join(path, x), os.X_OK) and not os.path.isdir(os.path.join(path, x))])
     return set(r)
 
 
-def read_definitions(*, cmd_name, suffix):
+def read_definitions(*, cmd_name, suffix, paths=None):
+    if paths is None:
+        paths = os.environ["PATH"]
     r = defaultdict(set)
     prefix = f'{cmd_name}-projecttype-'
     assert suffix[0] == '.'
-    for path in os.environ["PATH"].split(os.pathsep):
+    for path in paths.split(os.pathsep):
         for filename in os.listdir(path):
             if filename.startswith(prefix) and filename.endswith(suffix) and not os.access(os.path.join(path, filename), os.X_OK):
                 project_type = filename[len(prefix):-len(suffix)]

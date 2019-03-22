@@ -130,7 +130,7 @@ def auto_detect_project_type_tester(filenames):
                 with open(filename, 'w'):
                     pass
 
-        return auto_detect_project_type(cmd_name='p')
+        return auto_detect_project_type(cmd_name='p', paths=os.path.dirname(os.path.dirname(__file__)))
     finally:
         os.chdir('..')
 
