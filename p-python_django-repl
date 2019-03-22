@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+$(p env_path)/bin/python manage.py shell

@@ -9,15 +9,11 @@ from p import validate_config, ConfigError, resolve_cmd, alias_and_resolve, alia
 
 
 def test_alias_project_type():
-    assert alias_project_type(cmd_name='p', cmd=('p', 'repl'), cfg=dict(project_type='python')) == ('p', 'python', 'repl')
+    assert alias_project_type(cmd_name='p', cmd=('p', 'repl'), project_type='python') == ('p', 'python', 'repl')
 
     with pytest.raises(AssertionError):
         # alias already applied
-        alias_project_type(cmd_name='p', cmd=('p', 'python', 'repl'), cfg=dict(project_type='python'))
-
-    with pytest.raises(AssertionError):
-        # no project_type
-        alias_project_type(cmd_name='p', cmd=('foo', 'bar'), cfg={})
+        alias_project_type(cmd_name='p', cmd=('p', 'python', 'repl'), project_type='python')
 
 
 def test_alias_once1():
@@ -117,6 +113,18 @@ def test_fallback_to_non_project_specific_command():
     )
 
 
+def test_fallback_to_non_subtype_specific_command():
+    assert 'p-python-repl' == alias_and_resolve(
+        cmd_name='p',
+        cmd=('p', 'repl'),
+        available_commands=['p-python-repl'],
+        cfg=dict(
+            project_type='python_django',
+            aliases={},
+        )
+    )
+
+
 def auto_detect_project_type_tester(filenames):
     rmtree('test_tmp', ignore_errors=True)
     os.mkdir('test_tmp')
@@ -169,6 +177,13 @@ def test_autodetect_python():
 def test_autodetect_python2():
     assert 'python' == auto_detect_project_type_tester(filenames=[
         'setup.py',
+    ])
+
+
+def test_autodetect_python_django():
+    assert 'python_django' == auto_detect_project_type_tester(filenames=[
+        'setup.py',
+        'manage.py',
     ])
 
 

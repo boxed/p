@@ -51,6 +51,7 @@ def main(argv):
             stdout=sys.stdout,
             stderr=sys.stderr,
             env={
+                **os.environ,
                 RECURSION_DEPTH_ENVIRONMENT_VARIABLE: str(recursion_depth + 1),
             },
         )

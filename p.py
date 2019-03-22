@@ -17,7 +17,7 @@ def auto_detect_project_type(*, cmd_name, paths=None):
     commands = [x for x in available_commands if x.startswith(prefix)]
 
     filenames = set(os.listdir('.'))
-    for key, definitions in txt_definitions.items():
+    for key, definitions in sorted(txt_definitions.items(), reverse=True):
         for definition in definitions:
             if definition in filenames:
                 return key
@@ -73,14 +73,12 @@ def read_definitions(*, cmd_name, suffix, paths=None):
     return r
 
 
-def alias_project_type(*, cmd_name, cmd, cfg):
-    assert 'project_type' in cfg
-
+def alias_project_type(*, cmd_name, cmd, project_type):
     prefix, *command = cmd
-    assert command[0] != cfg['project_type']
+    assert command[0] != project_type
 
     assert prefix == cmd_name
-    command = (cfg['project_type'], ) + tuple(command)
+    command = (project_type, ) + tuple(command)
 
     return (prefix, ) + command
 
@@ -111,7 +109,7 @@ def resolve_cmd(*, available_commands, cmd_name, cmd, cfg):
 
     r = None
     if 'project_type' in cfg:
-        r = _resolve_cmd(available_commands=available_commands, cmd=alias_project_type(cmd_name=cmd_name, cmd=cmd, cfg=cfg))
+        r = _resolve_cmd(available_commands=available_commands, cmd=alias_project_type(cmd_name=cmd_name, cmd=cmd, project_type=cfg['project_type']))
 
     if r is None:
         r = _resolve_cmd(available_commands=available_commands, cmd=cmd)
@@ -135,6 +133,11 @@ def _resolve_cmd(*, available_commands, cmd):
 
     if prefix in available_commands:
         return ' '.join([prefix] + command)
+
+    if '_' in cmd[1]:
+        return _resolve_cmd(available_commands=available_commands, cmd=(cmd[0], cmd[1].rpartition('_')[0]) + cmd[2:])
+
+    return None
 
 
 def alias_and_resolve(*, cmd_name, cmd, available_commands, cfg):

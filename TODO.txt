@@ -1,8 +1,6 @@
 * autodetect project type for top 10 languages
 * auto install requirements for autodetected languages
 * p-*-new for detected languages
-* sub-types: python/django
-    * autodetect django when manage.py exists
 
 * Python specific:
     * p-new-python
