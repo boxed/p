@@ -13,9 +13,11 @@ def main(argv):
     _, my_name = os.path.split(argv[0])
     cmd_name, _ = os.path.splitext(my_name)
 
+    available_commands = find_available_commands()
+
     cfg = read_cfg(cmd_name=cmd_name)
     if 'project_type' not in cfg:
-        detected_project_type = auto_detect_project_type(cmd_name=cmd_name)
+        detected_project_type = auto_detect_project_type(cmd_name=cmd_name, available_commands=available_commands)
         if detected_project_type:
             cfg['project_type'] = detected_project_type
 
@@ -25,7 +27,6 @@ def main(argv):
         print('ERROR: infinite loop detected')
         return -1
 
-    available_commands = find_available_commands()
     command = alias_and_resolve(
         cmd_name=cmd_name,
         cmd=(cmd_name, ) + tuple(argv[1:]),

@@ -7,21 +7,24 @@ from configparser import ConfigParser
 from subprocess import check_output, CalledProcessError
 
 
-def auto_detect_project_type(*, cmd_name, paths=None):
+def auto_detect_project_type(*, cmd_name, paths=None, txt_definitions=None, regex_definitions=None, available_commands=None):
     prefix = f'{cmd_name}-projecttype-'
 
-    available_commands = find_available_commands(paths=paths)
-    txt_definitions = read_definitions(cmd_name=cmd_name, suffix='.txt', paths=paths)
-    regex_definitions = read_definitions(cmd_name=cmd_name, suffix='.regex', paths=paths)
-
+    if available_commands is None:
+        available_commands = find_available_commands(paths=paths)
     commands = [x for x in available_commands if x.startswith(prefix)]
 
     filenames = set(os.listdir('.'))
+
+    if txt_definitions is None:
+        txt_definitions = read_definitions(cmd_name=cmd_name, suffix='.txt', paths=paths)
     for key, definitions in sorted(txt_definitions.items(), reverse=True):
         for definition in definitions:
             if definition in filenames:
                 return key
 
+    if regex_definitions is None:
+        regex_definitions = read_definitions(cmd_name=cmd_name, suffix='.regex', paths=paths)
     for key, definitions in regex_definitions.items():
         for definition in definitions:
             for filename in filenames:
@@ -53,7 +56,7 @@ def find_available_commands(*, paths=None):
         paths = os.environ["PATH"]
     r = []
     for path in paths.split(os.pathsep):
-        r.extend([x for x in os.listdir(path) if os.access(os.path.join(path, x), os.X_OK) and not os.path.isdir(os.path.join(path, x))])
+        r.extend(os.listdir(path))
     return set(r)
 
 
