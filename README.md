@@ -11,7 +11,7 @@ Installing dependencies
 Tested ok!
 ```
 
-...but what is that `somecommand`? For elm it's easy, it's `elm`, but for rust it's `cargo` and for Clojure it's `lein`. For some languages there are more than one you need to know about or multiple separate tools that do parts of this.
+...but what is that `somecommand`? For elm it's easy, it's `elm`, but for rust it's `cargo` and for Clojure it's `lein`. For some languages there are more than one you need to know about or multiple separate tools that do parts of this. And do you explicitly need to tell it to download dependencies? For `elm` you do, but not for `lein`. It's a bit of a mess.
 
 p is the tool to put that under one roof.
 
