@@ -57,7 +57,7 @@ you can use with python.
 
 [`p python test`](#python-test)
 
-[`p python uninstall`](#python-unistall)
+[`p python uninstall`](#python-uninstall)
 
 ### `python env_path`
 Prints the name of the hidden [virtualenv](https://virtualenv.pypa.io/en/stable/) directory,
