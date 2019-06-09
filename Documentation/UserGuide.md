@@ -1,4 +1,4 @@
-# User Guid for p, the genral project manager
+# User Guide for p, the genral project manager
 Many languages have their own project manager.
 Some examples are cargo for rust, elm for elm,
 lein for clojure,
@@ -13,11 +13,17 @@ This adds extra challenges to
 learning a new language.
 An unnecessary challenge, I think.
 
+## Install
+You need Python 3.7.3 or higher installed,
+and it must be the default in
 
-With p you will be able to create a project
-for any (supported) language with this command:
+This is the general form of a p command:
 ```bash
-p new <language> foo
+p <language> <cmd>
 ```
-This configures a project in the `foo` directory
-for the `<language>` you specified.
+If `p` can, it will detect the type
+of your project,
+and you can omit the <language> part.
+
+Currently these are the basic commands that
+you can use with python.
