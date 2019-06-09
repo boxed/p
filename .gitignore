@@ -51,3 +51,8 @@ docs/tri*.rst
 # tests
 results/
 test_tmp/
+
+# Emacs
+.\#*
+*~
+\#*\#
