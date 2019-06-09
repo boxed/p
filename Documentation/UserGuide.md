@@ -22,11 +22,9 @@ p works on:
 | Linux | >Python 3.7.3     | None               |
 |       |                   |                    |
 
-
-You have to have Python 3.7.3 installed in the default
-location ( no altinstall ).
 Clone or download [this repository](https://github.com/boxed/p.git)
 and add the location of p to your PATH variable.
+
 Then go to a Python or Swift project and
 type:
 ```bash
