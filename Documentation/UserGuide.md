@@ -47,13 +47,13 @@ and you can omit the <language> part.
 Currently these are the basic commands that
 you can use with python.
 
-[`p python env_path`](#python-env_path)
-[`p python install`](#python-install)
-[`p python install requirements hashes cache`](#python-install-requirements-hashes-cache)
-[`p python repl`](#python-repl)
-[`p python run`](#python-run)
-[`p python test`](#python-test)
-[`p python uninstall`](#python-unistall)
+- [`p python env_path`](#python-env_path)
+- [`p python install`](#python-install)
+- [`p python install requirements hashes cache`](#python-install-requirements-hashes-cache)
+- [`p python repl`](#python-repl)
+- [`p python run`](#python-run)
+- [`p python test`](#python-test)
+- [`p python uninstall`](#python-unistall)
 
 ### `python env_path`
 Prints the name of the hidden [virtualenv](https://virtualenv.pypa.io/en/stable/) directory,
