@@ -1,4 +1,4 @@
-# User Guide for p, the genral project manager
+# User Guide for p, the general project manager
 Many languages have their own project manager.
 Some examples are cargo for rust, elm for elm,
 lein for clojure,
