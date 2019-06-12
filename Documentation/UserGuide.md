@@ -70,9 +70,6 @@ the same arguments to `p install` as to `pip install`, with
 the only difference being that `p install` installs in the virtualenv python
 of your project and `pip install` installs into your computers version of python.
 
-### `python install requirements hashes cache`
-**TODO**
-
 ### `python repl`
 Open Python repl from virtualenv.
 
