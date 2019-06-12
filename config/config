@@ -1,0 +1,31 @@
+#! /usr/env python3
+from CLI.CLI import CLI
+
+# Config variables
+P_CONFIG_PATH = "~/.pconfig" if sys.platform == "linux" or sys.platform == "darwin" else ""
+# I don't know where to put this on windows
+# End Config variables
+
+class Config(CLI):
+    """
+Usage:
+p config install <package-name>     Install language support package
+p config remove <package-name>      Deinstall language support package
+    """
+
+    def __init__(self):
+        super().__init__("config.json","install","remove",directory=os.environ["PWD"])
+
+    def install(self,[package_name,]):
+        # Install package globally for p
+        print(f"Install package {package_name}")
+
+        # Not yet implemented
+        print("Can't install packages yet")
+
+    def remove(self,[package_name,]):
+        # Remove package globally from p
+        print(f"Remove package {package_name}")
+
+        # Not yet implemented
+        print("Can't remove packages yet")
