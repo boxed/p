@@ -19,7 +19,7 @@ p works on:
 
 | OS    | Version of Python | Other requirements |
 |-------|-------------------|--------------------|
-| Linux | >Python 3.7.3     | None               |
+| Linux | >Python 3.6       | None               |
 |       |                   |                    |
 
 Clone or download [this repository](https://github.com/boxed/p.git)
