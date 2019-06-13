@@ -1,27 +1,83 @@
-# User Guid for p, the genral project manager
-Many languages have an own project manager.
+# User Guide for p, the general project manager
+Many languages have their own project manager.
 Some examples are cargo for rust, elm for elm,
-lein for clojure, you name it.
+lein for clojure,
+you name it.
 
-But did you ever try to use cargo as you use elm
-or lein as you use elm?
-If you did, I'm sorry for your failure.
+But did you ever try to use cargo as
+you use elm?
+You can't use one project manager as
+you use another one.
 
-One project manager for one language isn't
-interchangeable with the project manager
-of another language.
 This adds extra challenges to
 learning a new language.
 An unnecessary challenge, I think.
 
-I think the problem is now explained
-sufficently and you know what problem
-p tries to solve.
+## Install
 
-With p you will be able to create a project
-for any (supported) language with this command:
+p works on:
+
+| OS    | Version of Python | Other requirements |
+|-------|-------------------|--------------------|
+| Linux | >Python 3.6       | None               |
+|       |                   |                    |
+
+Clone or download [this repository](https://github.com/boxed/p.git)
+and add the location of p to your PATH variable.
+
+Then go to a Python or Swift project and
+type:
 ```bash
-p new <language> foo
+p
 ```
-This configures a project in the `foo` directory
-for the `<language>` you specified.
+You'll be greeted with usage information about these commands.
+
+## Most common commands
+
+This is the general form of a p command:
+```bash
+p <language> <cmd>
+```
+If `p` can, it will detect the type
+of your project,
+and you can omit the <language> part.
+
+Currently these are the basic commands that
+you can use with python.
+
+[`p python env_path`](#python-env_path)
+
+[`p python install`](#python-install)
+
+[`p python install requirements hashes cache`](#python-install-requirements-hashes-cache)
+
+[`p python repl`](#python-repl)
+
+[`p python run`](#python-run)
+
+[`p python test`](#python-test)
+
+[`p python uninstall`](#python-uninstall)
+
+### `python env_path`
+Prints the name of the hidden [virtualenv](https://virtualenv.pypa.io/en/stable/) directory,
+p always uses a isolated version of python and pip, virtualenv is used by all commands
+in p with python.
+
+### `python install`
+Install module from PyPi or other sources, you can provide
+the same arguments to `p install` as to `pip install`, with
+the only difference being that `p install` installs in the virtualenv python
+of your project and `pip install` installs into your computers version of python.
+
+### `python repl`
+Open Python repl from virtualenv.
+
+### `python run`
+Run python file with virtualenv python.
+
+### `python test`
+Run pytest
+
+### `python uninstall`
+Uninstall package you installed via [`p python install`](#python-install)
