@@ -6,7 +6,7 @@ import Text.Printf (printf)
 
 -- Custom Modules
 import Call (call)
-import Config (P_MATCHES,P_CONFIG,P_FOLDER) -- Config variables
+import Config (p_config,p_folder) -- Config variables
 
 main :: IO ()
 main = do
@@ -41,6 +41,6 @@ main = do
      If you execute the command:
      p python install <pip-package>
      p would execute ~/.p/packages/python/install <pip-package>.
-     ( The .p Folder path is in the P_FOLDER variable).
+     ( The .p Folder path is in the p_folder variable).
   -}
-  output <- call $ join pathSeparator [".",P_FOLDER,"packages",language,command] -- Command executes
+  output <- call $ join pathSeparator [".",p_folder,"packages",language,command] -- Command executes
