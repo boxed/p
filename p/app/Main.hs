@@ -5,13 +5,12 @@ import System.FilePath.Posix (pathSeparator) -- / for Linux/OS X and \ for Windo
 import Text.Printf (printf)
 import System.Environment
 import Data.List.Split
-
+import System.Process as Process
 -- Custom Modules
 import Project
 import Call (call)
 import Config (p_config,p_folder,ls_command,execute_cmd) -- Config variables
 
-main :: IO ()
 main = do
   -- p Commands:
   -- Every p Command follows this scheme:
@@ -23,7 +22,7 @@ main = do
   -- p <language> <command> <args>
   args <- getArgs
 
-  let language = (args !! 0)
+  let language = (args !! 0) -- TODO: implement auto_detect
       command = if language /= (args !! 0) then (args !! 0) else (args !! 1) -- if didn't auto detect work, use args !! 1
   {-
      Packages are folders in the ~/.p/packages directory
@@ -42,5 +41,5 @@ main = do
      p would execute ~/.p/packages/python/install <pip-package>.
      ( The .p Folder path is in the p_folder variable).
   -}
-  output <- call $ execute_cmd ++ create_path [p_folder,"packages",language,command] -- Command executes
-  return ()
+  Process.runCommand $ execute_cmd ++ (create_path [p_folder,"packages",language,command]) -- Execute command without caputring output
+
