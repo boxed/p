@@ -13,3 +13,6 @@ p_config = if unix then "~/.pconfig" else "~\\.pconfig"
 
 -- Again, I don't know about Windows
 p_folder = if unix then "~/.p" else "~\\.p"
+
+-- Execute a command on the specific machine
+execute_cmd = if unix then "" else ""

@@ -9,7 +9,7 @@ import Data.List.Split
 -- Custom Modules
 import Project
 import Call (call)
-import Config (p_config,p_folder,ls_command) -- Config variables
+import Config (p_config,p_folder,ls_command,execute_cmd) -- Config variables
 
 main :: IO ()
 main = do
@@ -23,13 +23,8 @@ main = do
   -- p <language> <command> <args>
   args <- getArgs
 
-  -- Detect the project and if that is not possible, use args[0]
-  languages <- call $ ls_command ++ (create_path [p_folder,"packages"])
-  language <- auto_detect (args !! 0) $ splitOn " " languages
-
-  -- If auto detection worked, use args[1], else args[0]
-  let command = if language /= (args !! 0) then (args !! 0) else (args !! 1)
-
+  let language = (args !! 0)
+      command = if language /= (args !! 0) then (args !! 0) else (args !! 1) -- if didn't auto detect work, use args !! 1
   {-
      Packages are folders in the ~/.p/packages directory
      ~/.p/packages/
@@ -47,5 +42,5 @@ main = do
      p would execute ~/.p/packages/python/install <pip-package>.
      ( The .p Folder path is in the p_folder variable).
   -}
-  output <- call $ create_path [".",p_folder,"packages",language,command] -- Command executes
+  output <- call $ execute_cmd ++ create_path [p_folder,"packages",language,command] -- Command executes
   return ()
