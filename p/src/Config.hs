@@ -14,7 +14,7 @@ ls_command = if unix then "ls " else "dir "
 p_config = if unix then "~/.pconfig" else "~\\.pconfig"
 
 -- Again, I don't know about Windows
-p_folder = if unix then  do absolute_path "~/.p" else do return "~\\.p"
+p_folder = if unix then "/home/joris/.p" else "~\\.p"
 
 -- Execute a command on the specific machine
 execute_cmd = if unix then "" else ""
