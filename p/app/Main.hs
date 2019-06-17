@@ -3,10 +3,13 @@ module Main where
 -- System Modules
 import System.FilePath.Posix (pathSeparator) -- / for Linux/OS X and \ for Windows
 import Text.Printf (printf)
+import System.Environment
+import Data.List.Split
 
 -- Custom Modules
+import Project
 import Call (call)
-import Config (p_config,p_folder) -- Config variables
+import Config (p_config,p_folder,ls_command) -- Config variables
 
 main :: IO ()
 main = do
@@ -21,10 +24,11 @@ main = do
   args <- getArgs
 
   -- Detect the project and if that is not possible, use args[0]
-  language <- auto_detect args[0]
+  languages <- call $ ls_command ++ (create_path [p_folder,"packages"])
+  language <- auto_detect (args !! 0) $ splitOn " " languages
 
   -- If auto detection worked, use args[1], else args[0]
-  let command = if language /= args[0] then args[0] else args[1]
+  let command = if language /= (args !! 0) then (args !! 0) else (args !! 1)
 
   {-
      Packages are folders in the ~/.p/packages directory
@@ -43,4 +47,5 @@ main = do
      p would execute ~/.p/packages/python/install <pip-package>.
      ( The .p Folder path is in the p_folder variable).
   -}
-  output <- call $ join pathSeparator [".",p_folder,"packages",language,command] -- Command executes
+  output <- call $ create_path [".",p_folder,"packages",language,command] -- Command executes
+  return ()
