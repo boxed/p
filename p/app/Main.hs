@@ -41,5 +41,4 @@ main = do
      p would execute ~/.p/packages/python/install <pip-package>.
      ( The .p Folder path is in the p_folder variable).
   -}
-  Process.runCommand $ execute_cmd ++ (create_path [p_folder,"packages",language,command]) -- Execute command without caputring output
-
+  Process.callProcess (execute_cmd ++ (create_path [p_folder,"packages",language,command])) [] -- Execute command without caputring output
