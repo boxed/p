@@ -38,6 +38,26 @@ And a way of detecting the project type.
 ### Near future (alpha phase)
 Some goals here p already achives:
 
-1. Call other binaries for commands and give arguments
+1. Parse arguments by this scheme: `p <language> <command>`
+p takes these arguments:
 
-2. 
+| `language` | The project type                       |
+|------------|----------------------------------------|
+| `command`  | Command name specific to project type  |
+
+Each command is a seperate executable and called by p
+and provided with any arguments provided by the user behind `command`.
+If p can auto detect the project type, it'll omit the `language` argument
+and let `command` be the first argument.
+
+2. Auto detect by txt or regex
+Auto detecting the type of project in the working directory is one of the most important
+features of p, to make p a usable progam.
+This is part of every language package and thus p-language.
+p has two ways to detect the project type:
+1. Text matching
+2. Regualar Expressions
+
+p compares the project structure with these files in the language packages.
+And if p could match them, p will limit the set of commands to the commands
+in the language packages.
