@@ -25,6 +25,8 @@ main = do
   let language = (args !! 0) -- TODO: implement auto_detect
       command = if language /= (args !! 0) then (args !! 0) else (args !! 1) -- if didn't auto detect work, use args !! 1
   {-
+     1. Execute p-<language>-<command> in the working directory, if such file exists.
+     2. Execute command p-<language> in locations stored in .p-paths
      Packages are folders in the ~/.p/packages directory
      ~/.p/packages/
      ├── go
@@ -41,4 +43,9 @@ main = do
      p would execute ~/.p/packages/python/install <pip-package>.
      ( The .p Folder path is in the p_folder variable).
   -}
-  Process.callProcess (execute_cmd ++ (create_path [p_folder,"packages",language,command])) [] -- Execute command without caputring output
+  ls_p_language_command <- (call "ls p-" ++ language ++ "-" ++ command)
+  let local_binary_exists = ls_p_language_command != ""
+
+  
+  binary = if local_binary_exists then "p-" ++ language ++ "-" ++ command else if lookup_
+  Process.callProcess (execute_cmd ++ (create_path [p_folder,"packages",language,command])) [] -- Execute command and wait for it to finish.
