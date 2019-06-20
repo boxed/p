@@ -39,6 +39,7 @@ And a way of detecting the project type.
 Some goals here p already achives:
 
 1. Parse arguments by this scheme: `p <language> <command>`
+
 p takes these arguments:
 
 | `language` | The project type                       |
@@ -51,6 +52,7 @@ If p can auto detect the project type, it'll omit the `language` argument
 and let `command` be the first argument.
 
 2. Auto detect by txt or regex
+
 Auto detecting the type of project in the working directory is one of the most important
 features of p, to make p a usable progam.
 This is part of every language package and thus p-language.
