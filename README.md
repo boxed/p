@@ -42,3 +42,6 @@ Alises
 - Build prototype of command dispatcher (includes config file reader, and maybe more) in python
 - When this works well and is solid with good tests (mutation tested ideally), port this base to some compiled language that is faster. Every millisecond counts!
 - In parallel to the testing of the prototype build out language support. This should be safe to do since the final command dispatcher will just use this actual code so that won't need to be rewritten.
+
+
+## [Further Documentation](Documentation/README.md)
