@@ -51,12 +51,20 @@ def auto_detect_project_type(*, cmd_name, paths=None, txt_definitions=None, rege
         return None
 
 
-def find_available_commands(*, paths=None):
+def find_available_commands(*, paths=[]):
+    """
+find_available_commands:
+Arguments:
+paths=[] : List of locations (str), in which to look for files to execute as commands.
+    """
     if paths is None:
-        paths = os.environ["PATH"]
+        paths = os.environ["PATH"].split(os.pathsep)
     r = []
     for path in paths.split(os.pathsep):
-        r.extend(os.listdir(path))
+        try:
+            r.extend(os.listdir(path))
+        except FileNotFoundError:
+            continue
     return set(r)
 
 
