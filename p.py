@@ -50,31 +50,38 @@ def auto_detect_project_type(*, cmd_name, paths=None, txt_definitions=None, rege
     else:
         return None
 
+def get_paths(paths=[]):
+    """
+get_path
+---------
+Arguments:
+paths: List of locations, if given get_path only filters out all non-existing locations.
+Returns:
+List of all existing locations in the PATH variable 
+    """
+    if paths:
+        return filter(os.path.exists,paths)
+    return filter(os.path.exists,os.environ["PATH"].split(os.pathsep))
 
-def find_available_commands(*, paths=[]):
+def find_available_commands(*, paths=None):
     """
 find_available_commands:
 Arguments:
 paths=[] : List of locations (str), in which to look for files to execute as commands.
     """
-    if paths is None:
-        paths = os.environ["PATH"].split(os.pathsep)
-    r = []
-    for path in paths.split(os.pathsep):
-        try:
-            r.extend(os.listdir(path))
-        except FileNotFoundError:
-            continue
-    return set(r)
+    paths = get_paths(paths)
+    content_paths = []
+    for path in paths:
+        content_paths.extend(os.listdir(path))
+    return set(content_paths)
 
 
 def read_definitions(*, cmd_name, suffix, paths=None):
-    if paths is None:
-        paths = os.environ["PATH"]
+    paths = get_paths(paths.split(os.pathsep)) if paths else get_paths()
     r = defaultdict(set)
     prefix = f'{cmd_name}-projecttype-'
     assert suffix[0] == '.'
-    for path in paths.split(os.pathsep):
+    for path in paths:
         for filename in os.listdir(path):
             if filename.startswith(prefix) and filename.endswith(suffix) and not os.access(os.path.join(path, filename), os.X_OK):
                 project_type = filename[len(prefix):-len(suffix)]
