@@ -10,6 +10,16 @@ RECURSION_DEPTH_ENVIRONMENT_VARIABLE = '_P_RECURSION_DEPTH'
 
 
 def main(argv):
+    """
+main
+--------
+Arguments:
+    argv : Commandline Arguments to the dispatcher
+Returns:
+    Return value to the system
+Description:
+
+    """
     _, my_name = os.path.split(argv[0])
     cmd_name, _ = os.path.splitext(my_name)
 
