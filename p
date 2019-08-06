@@ -1,4 +1,4 @@
-#! $(/usr/bin/which perl)
+#!/usr/bin/env perl
 
 # My default installation of perl
 use v5.024.1;
