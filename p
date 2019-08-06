@@ -1,7 +1,7 @@
 #! $(/usr/bin/which perl)
 
 # My default installation of perl
-use v5.24.1;
+use v5.024.1;
 
 # Perl can easily dispatch other programs with the `cat` operator
 # and capture their stdout with a simple assignment as a string:
