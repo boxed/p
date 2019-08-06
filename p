@@ -19,5 +19,3 @@ my $dispatchable_command = "$home_dir/.p/packages/$language/$command";
 
 
 my $output = `$dispatchable_command`;
-print "Output:$output";
-
