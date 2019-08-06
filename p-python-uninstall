@@ -1,2 +1,0 @@
-#!/usr/bin/env bash
-$(p env_path)/bin/pip uninstall $@
